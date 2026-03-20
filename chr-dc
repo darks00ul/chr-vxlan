@@ -1,0 +1,55 @@
+/interface bridge
+add name=br-vlan10
+add name=br-vlan20
+add name=br-vlan30
+
+/interface ethernet
+set [ find default-name=ether1 ] disable-running-check=no
+set [ find default-name=ether2 ] disable-running-check=no
+set [ find default-name=ether3 ] disable-running-check=no
+set [ find default-name=ether4 ] disable-running-check=no
+set [ find default-name=ether5 ] disable-running-check=no
+
+/interface vxlan
+add name=vxlan-vni10 vni=10
+add name=vxlan-vni20 vni=20
+add name=vxlan-vni30 vni=30
+
+/interface vlan
+add interface=ether2 name=ether2-vlan110 vlan-id=110
+add interface=ether2 name=ether2-vlan120 vlan-id=120
+add interface=ether2 name=ether2-vlan130 vlan-id=130
+
+/ip ipsec peer
+add address=172.16.1.2/32 exchange-mode=ike2 name=peer-customer
+
+/ip ipsec proposal
+add auth-algorithms=sha256 enc-algorithms=aes-256-cbc name=prop-vxlan pfs-group=modp2048
+
+/interface bridge port
+add bridge=br-vlan10 interface=ether2-vlan110
+add bridge=br-vlan10 interface=vxlan-vni10
+add bridge=br-vlan20 interface=ether2-vlan120
+add bridge=br-vlan20 interface=vxlan-vni20
+add bridge=br-vlan30 interface=ether2-vlan130
+add bridge=br-vlan30 interface=vxlan-vni30
+
+/interface vxlan vteps
+add interface=vxlan-vni10 remote-ip=172.16.1.2
+add interface=vxlan-vni20 remote-ip=172.16.1.2
+add interface=vxlan-vni30 remote-ip=172.16.1.2
+
+/ip address
+add address=172.16.2.2/30 interface=ether1 network=172.16.2.0
+
+/ip ipsec identity
+add peer=peer-customer secret=YOUR-SUPER-SECRET
+
+/ip ipsec policy
+add dst-address=172.16.1.2/32 peer=peer-customer proposal=prop-vxlan src-address=172.16.2.2/32
+
+/ip route
+add dst-address=0.0.0.0/0 gateway=172.16.2.1
+
+/system identity
+set name=CHE-DS
