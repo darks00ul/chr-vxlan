@@ -1,7 +1,7 @@
 /interface bridge
-add name=br-vlan10
-add name=br-vlan20
-add name=br-vlan30
+add name=br-vlan10 mtu=1390 
+add name=br-vlan20 mtu=1390 
+add name=br-vlan30 mtu=1390
 
 /interface ethernet
 set [ find default-name=ether1 ] disable-running-check=no
@@ -11,9 +11,9 @@ set [ find default-name=ether4 ] disable-running-check=no
 set [ find default-name=ether5 ] disable-running-check=no
 
 /interface vxlan
-add name=vxlan-vni10 vni=10
-add name=vxlan-vni20 vni=20
-add name=vxlan-vni30 vni=30
+add name=vxlan-vni10 vni=10 mtu=1390 
+add name=vxlan-vni20 vni=20 mtu=1390 
+add name=vxlan-vni30 vni=30 mtu=1390
 
 /interface vlan
 add interface=ether2 name=ether2-vlan10 vlan-id=10
